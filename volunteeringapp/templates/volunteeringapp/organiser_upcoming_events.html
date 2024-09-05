@@ -1,0 +1,55 @@
+{% extends './base.html' %}
+
+{% block title %}
+    Upcoming Events by {{ organiser.organisation_name }}
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+        <h1>Events by {{ organiser.organisation_name }}</h1>
+        <div class="container_detail">
+            <div class="organisation-details">
+                <h2>Organisation Details</h2>
+                <p><strong>Name:</strong> {{ organiser.organisation_name }}</p>
+                <p><strong>About:</strong> <br>{{ organiser.organisation_writeup }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ organiser.organisation_email }}">{{ organiser.organisation_email }}</a></p>
+            </div>
+        </div>
+
+        <div class="events-list">
+            <h2>Upcoming Events</h2>
+            {% if upcoming_events %}
+                <br>
+                <ul class="event-list">
+                    {% for event in upcoming_events %}
+                        <li class="event-item">
+                            <div class="event-image">
+                                {% if event.event_image %}
+                                    <img src="{{ event.event_image.url }}" alt="{{ event.title }}">
+                                {% endif %}
+                            </div>
+                            <div class="event-details">
+                                <h2>{{ event.title }}</h2>
+                                <p><strong>Date:</strong> {{ event.date }}</p>
+                                <p><strong>Location:</strong> {{ event.location }}</p>
+                                <p>
+                                    {% with event.description|slice:":200"|truncatewords:200 as desc %}
+                                        {{ desc }}{% if event.description|length > 200 %}...{% endif %}
+                                    {% endwith %}
+                                </p>
+                                <p><a href="{% url 'organiser_upcoming_events_by_name' organisation_name=event.organiser.organisation_name %}">{{ event.organiser.organisation_name }}</a></p>
+                                {% for tag in event.preference_tags.all %}
+                                    <a href="{% url 'discover' %}?category={{ tag.id }}" class="btn btn-outline-primary btn-sm">{{ tag }}</a>
+                                {% endfor %}
+                                <br>
+                                <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-primary btn-right">View Details</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No upcoming events for this organiser.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VolunteersUnite{% endblock %}</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+  <link rel="stylesheet" href="{% static 'css/volunteeringapp.css' %}">
+</head>
+<body>

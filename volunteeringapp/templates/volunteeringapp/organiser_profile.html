@@ -1,0 +1,32 @@
+{% extends './base.html' %}
+
+{% block title %}
+    Edit Organiser Profile
+{% endblock %}
+
+{% block content %}
+  <br>  
+  <h1>Update Your Profile</h1>
+  <br>
+  <div class="container_detail">
+    <h3>Organisation Name: {{ organisation_name }}</h3>
+    <br><br>
+    <h5>About: </h5>
+    <p>{{ organisation_writeup }}</p>
+    <br>
+  </div>
+
+
+  <div class="container_detail">
+    <h5>Edit your details</h5>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+    
+    <form action="{% url 'delete_account' %}" method="get">
+        <button type="submit" class="btn btn-danger">Delete Account</button>
+    </form>
+  </div>
+{% endblock %}

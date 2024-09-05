@@ -1,0 +1,87 @@
+{% extends './base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Your Events</h1>
+    
+    <div class="container_detail">
+      <h2>Upcoming Events</h2>
+      <br>
+      {% if upcoming_events %}
+        <div class="row event-row">
+          {% for event in upcoming_events %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card mb-4 event-card">
+                {% if event.event_image %}
+                  <img src="{{ event.event_image.url }}" class="card-img-top event-img" alt="{{ event.title }}">
+                {% endif %}
+                <div class="card-body event-card-body">
+                  <h5 class="card-title event-title">{{ event.title }}</h5>
+                  <p><strong>Date:</strong> {{ event.date }}</p>
+                  <p><strong>Location:</strong> {{ event.location }}</p>
+                  <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-primary">View Event</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No upcoming events.</p>
+      {% endif %}
+    </div>
+    
+    <div class="container_detail">
+      <h2>Past Events</h2>
+      <br>
+      {% if past_events %}
+        <div class="row event-row">
+          {% for event in past_events %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card mb-4 event-card">
+                {% if event.event_image %}
+                  <img src="{{ event.event_image.url }}" class="card-img-top event-img" alt="{{ event.title }}">
+                {% endif %}
+                <div class="card-body event-card-body">
+                  <h5 class="card-title event-title">{{ event.title }}</h5>
+                  <p><strong>Date:</strong> {{ event.date }}</p>
+                  <p><strong>Location:</strong> {{ event.location }}</p>
+                  <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-primary">View Event</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No past events.</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div class="container_detail">
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+
+        <div id='calendar'></div>
+
+        <!-- Importing the calendar feature -->
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+              var calendarEl = document.getElementById('calendar');
+
+              var calendar = new FullCalendar.Calendar(calendarEl, {
+                  initialView: 'dayGridMonth',  
+                  firstDay: 1,  
+                  events: '/calendar/events/',  
+                  headerToolbar: {
+                  left: 'prev,next today',
+                  center: 'title',
+                  right: 'dayGridMonth'
+              },
+          });
+
+          calendar.render();
+      });
+    </script>
+  </div>
+{% endblock %}

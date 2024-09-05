@@ -1,0 +1,24 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+    <!-- SECOND LOGIN OPTION AND TO DEAL WITH ANY CREDENTIALS ISSUE -->
+    <div class="container_detail_creds">
+        <h3>Sorry you have entered invalid credentials</h3>
+        <p>Please kindly try again</p>
+        <br>
+        <form id="login_form" method="post" action="/login/">
+            {% csrf_token %}
+            Username: <input type="text" name="username" value="" />
+            <br />
+            Password: <input type="password" name="password" value="" />
+            <br />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+    <br>
+    <div class="container_detail_creds">
+        <h3>Do not have an account with us?</h3>
+        <a class="retry_button" href="../register">Click here to sign up for an account</a>
+    </div>
+{% endblock %}

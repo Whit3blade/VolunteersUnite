@@ -1,0 +1,56 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<br>
+<div class="container_detail_creds">
+    <h1>Register</h1>
+
+    {% if registered %}
+        <strong>Thank you for registering</strong>
+        <h3>Click here to Log In</h3>
+        <a href="../login">Login Here</a>
+    {% else %}
+        <strong>Register here for an account</strong><br /><br><br>
+
+        <form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                <label for="id_first_name">First name:</label>
+                <input type="text" name="first_name" maxlength="150" id="id_first_name">
+            </p>
+            <p>
+                <label for="id_last_name">Last name:</label>
+                <input type="text" name="last_name" maxlength="150" id="id_last_name">
+            </p>
+            <p>
+                <label for="id_name">Preferred Name:</label>
+                <input type="text" name="name" maxlength="100" required="" id="id_name">
+            </p>
+            <p>
+                <label for="id_username">Username:</label>
+                <input type="text" name="username" maxlength="150" required="" id="id_username">
+                <br>
+                <span class="helptext">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
+            </p>
+            <p>
+                <label for="id_email">Email address:</label>
+                <input type="email" name="email" maxlength="254" id="id_email">
+            </p>
+            <p>
+                <label for="id_password">Password:</label>
+                <input type="password" name="password" required="" id="id_password">
+            </p>
+            <p>
+                <label for="id_account_type">Account type:</label>
+                <select name="account_type" id="id_account_type">
+                    <option value="participant">Participant</option>
+                    <option value="organiser">Organiser</option>
+                    <option value="administrator">Administrator</option>
+                </select>
+            </p>
+            <input type="submit" name="submit" value="Register" />
+        </form>
+    {% endif %}
+</div>  
+{% endblock %}

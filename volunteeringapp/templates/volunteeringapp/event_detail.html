@@ -1,0 +1,231 @@
+{% extends './base.html' %}
+
+{% block title %}
+    {% if event.closed %}
+        [Closed] - {{ event.title }}
+    {% else %}
+        {{ event.title }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="container_detail">
+        <h1>{{ event.title }}</h1>
+        {% if event.event_image %}
+        <img src="{{ event.event_image.url }}" class="img-fluid" alt="{{ event.title }}">
+        {% endif %}
+        <br>
+        <p><strong>Date:</strong> {{ event.date }}</p>
+        <br>
+        <p><strong>About:</strong> {{ event.description }}</p>
+        <br>
+        <p><strong>Rating:</strong> {{ event.rating }}</p>
+        <br>
+        <p>Organiser: <a class="organiser-link" href="{% url 'organiser_upcoming_events_by_name' organisation_name=event.organiser.organisation_name %}">{{ event.organiser.organisation_name }}</a></p>
+        <br>
+        {% if event.preference_tags.exists %}
+            <p><strong>Categories:</strong></p>
+            <div class="category-buttons">
+                {% for tag in event.preference_tags.all %}
+                    <a href="{% url 'discover' %}?category={{ tag.id }}" class="btn btn-category">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="container_detail">
+        {% if user.is_authenticated %}
+            {% if event_closed %}
+                <button class="btn btn-secondary" disabled>Event Closed</button>
+                <p>Thank you for your interest. Unfortunately this event has concluded and stay tuned for upcoming events</p>
+            {% else %}
+                {% if signups_locked %}
+                    <button class="btn btn-secondary" disabled>Event is Locked</button>
+                    <p>Please contact the organiser should you have any enquiries</p>
+                {% else %}
+                    {% if user_participation %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="withdraw" class="btn btn-warning">Withdraw from Event</button>
+                        </form>
+                    {% else %}
+                        {% if remaining_slots > 0 %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" name="signup" class="btn btn-primary">Sign Up for Event</button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>Currently Full</button>
+                            <p>Check back in for any available slots.</p>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                <p><strong>Max Participants:</strong> {{ event.max_participants }}</p>
+                <p>Slots Remaining: {{ remaining_slots }}</p>
+            {% endif %}
+        {% else %}
+            <p><a href="{% url 'login' %}">Log in</a> or <a href="{% url 'register' %}">Register an account</a> to sign up for this event.</p>
+        {% endif %}
+
+        {% if event.preference_tag %}
+            <p><strong>Category:</strong> 
+                <a href="{% url 'discover' %}?status=active&category={{ event.preference_tag.id }}&sort_by=date_asc" class="btn btn-info">
+                {{ event.preference_tag.name }}
+                </a>
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- ONLY WHEN AUTHENTICATED AND THE SIGNUPS IS LOCKED BY ADMIN THEN THE CHAT ROOM WILL APPEAR -->
+    {% if user.is_authenticated %}
+        {% if user.appuser.account_type == 'organiser' or user_participation %}
+            {% if signups_locked %}
+                <div class="container_detail">
+                <hr>
+                <h2>Event Chat</h2>
+                <textarea id="chat-log" cols="50" rows="10"></textarea><br>
+                <input id="chat-message-input" type="text" size="50"><br>
+                <input id="chat-message-submit" type="button" value="Send">
+                {{ event.id|json_script:"room-name" }}
+                <script>
+                        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+                        const username = "{{ request.user.username }}"; // Fetch the username from the server-side context
+
+                        function formatRelativeTime(timestamp) {
+                            const now = new Date();
+                            const messageTime = new Date(timestamp);
+                            const diff = now - messageTime;
+
+                            const seconds = Math.floor(diff / 1000);
+                            const minutes = Math.floor(seconds / 60);
+                            const hours = Math.floor(minutes / 60);
+                            const days = Math.floor(hours / 24);
+
+                            if (days > 0) {
+                                return `${days} day${days > 1 ? 's' : ''} ago`;
+                            } else if (hours > 0) {
+                                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                            } else if (minutes > 0) {
+                                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                            } else {
+                                return 'Just now';
+                            }
+                        }
+
+                        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/' + roomName + '/');
+
+                        chatSocket.onmessage = function(e) {
+                            const data = JSON.parse(e.data);
+                            
+                            if (data.type === 'chat_history') {
+                                // Clear the chat log
+                                document.querySelector('#chat-log').value = '';
+
+                                // Append previous messages
+                                data.messages.forEach(function(message) {
+                                    const formattedTime = formatRelativeTime(message.timestamp);
+                                    document.querySelector('#chat-log').value += (message.username + " (" + formattedTime + "): " + message.message + '\n');
+                                });
+                            } else {
+                                const formattedTime = formatRelativeTime(data.timestamp);
+                                document.querySelector('#chat-log').value += (data.username + " (" + formattedTime + "): " + data.message + '\n');
+                            }
+                        };
+
+                        chatSocket.onclose = function(e) {
+                            console.error('Chat socket closed unexpectedly');
+                        };
+
+                        document.querySelector('#chat-message-input').focus();
+                        document.querySelector('#chat-message-input').onkeyup = function(e) {
+                            if (e.keyCode === 13) {  
+                                document.querySelector('#chat-message-submit').click();
+                            }
+                        };
+
+                        document.querySelector('#chat-message-submit').onclick = function(e) {
+                            const messageInputDom = document.querySelector('#chat-message-input');
+                            const message = messageInputDom.value;
+                            const timestamp = new Date().toISOString();
+
+                            chatSocket.send(JSON.stringify({
+                                'username': username,
+                                'timestamp': timestamp,
+                                'message': message
+                            }));
+
+                            messageInputDom.value = '';
+                        };
+                </script>
+
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    
+    <div class="map-container">
+        <iframe
+            width="600"
+            height="450"
+            style="border:0"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyATL1P-aPbLwtDgn-XY3CjtnRiUpUw1ClY&q={{ event.location|urlencode }}">
+        </iframe>
+        <p><strong>Location:</strong> {{ event.location }}</p>
+    </div>
+
+    {% if user.is_authenticated and user.appuser.account_type == 'organiser' and user.appuser.organiser == event.organiser %}
+        <div class="container_detail">
+            <h2>Participants Signed Up:</h2>
+            <ul>
+                {% for participation in participants %}
+                    <li>Name: {{ participation.participant.name }} - Experience Level: {{ participation.participant.experience_level }}</li>
+                {% empty %}
+                    <li>No participants signed up yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="container_detail">
+            <strong>Organiser Actions</strong>
+                {% if not event_closed %}
+                    <form method="post" action="{% url 'toggle_signups_lock' event.pk %}">
+                    {% csrf_token %}
+                        {% if signups_locked %}
+                            <button type="submit" class="btn btn-danger">Unlock Sign-ups</button>
+                            <p>Sign-ups are currently locked. No further sign-ups or withdrawals are allowed.</p>
+                        {% else %}
+                            <button type="submit" class="btn btn-warning">Disable Sign Ups </button>
+                        {% endif %}
+                    </form>
+                    <br>
+
+                    <a href="{% url 'edit_event' event.id %}" class="btn btn-warning">Edit Event</a>
+                    <a href="{% url 'delete_event' event.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete Event</a>
+                
+
+                    <br>
+                    {% if not event.closed %}
+            <form method="post">
+                {% csrf_token %}
+                <p>Close Event & award rating points</p>
+                <button type="submit" name="close_event" class="btn btn-danger">Close Event</button>
+            </form>
+        {% else %}
+            <p>Event is closed.</p>
+        {% endif %}
+                {% endif %}
+        </div>
+    {% endif %}
+
+    {% if user.appuser.account_type == 'administrator' %}
+    <div class="container_detail">
+        <p>Administrator Access Rights</p>
+        <!-- Duplicated as I need to allow the administrator access to delete still  -->
+        <a href="{% url 'delete_event' event.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete Event</a>
+    </div>    
+    {% endif %}
+
+  </div>
+{% endblock %}

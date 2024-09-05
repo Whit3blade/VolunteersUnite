@@ -1,0 +1,18 @@
+{% extends './base.html' %}
+
+{% block title %}
+   Create event for organisers
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1>Create a New Event</h1>
+    <div class="container_detail">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Create Event</button>
+    </form>
+    </div>
+  </div>
+{% endblock %}

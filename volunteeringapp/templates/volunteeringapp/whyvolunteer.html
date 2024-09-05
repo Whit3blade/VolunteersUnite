@@ -1,0 +1,59 @@
+{% extends './base.html' %}
+
+{% block title %}
+  Why Volunteer
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1>Why Volunteer?</h1>
+
+    <section class="intro">
+      <p>People volunteer for various reasons. For some, it is an opportunity to give back to the community or make a positive impact on those around them. For others, it's a chance to develop new skills, enhance existing experiences, make new friends, and forge closer bonds with the community. Regardless of the motivation, many express that volunteering is both challenging and rewarding.</p>
+    </section>
+
+    <section class="benefits">
+      <h2>Benefits of Volunteering</h2>
+      <br>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="benefit-item">
+            <h3>Build Connections</h3>
+            <p>Volunteering is a great way to create meaningful connections Whether your goal is to make the world a better place, or learn new skills, you’ll always remember the people you bonded with while abroad, long after you’ve gotten home.</p>
+          </div>
+        </div>
+        <br>
+        <div class="col-md-4">
+          <div class="benefit-item">
+            <h3>Personal Growth</h3>
+            <p>Skilled volunteering is an excellent way to contribute to your community by using your unique skills and expertise. By volunteering, you can have a positive impact on the lives of others and contribute to building a more sustainable and equitable society. </p>
+          </div>
+        </div>
+        <br>
+        <div class="col-md-4">
+          <div class="benefit-item">
+            <h3>Improved Personal Wellbeing</h3>
+            <p>Volunteering may provide you with the tools you need to be a happy and well-rounded individual. Building bonds and connections with people you volunteer with also may counteract any social isolation. Many volunteer opportunities also may involve physical labor to keep you active and reduce stress.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonials">
+      <h2>Testimonials</h2>
+      <p>Hear from our volunteers:</p>
+      <blockquote>
+        <p>"Volunteering has been one of the most rewarding experiences of my life. I’ve learned so much, met incredible people, and made a real difference in the community." – Jane Doe</p>
+      </blockquote>
+      <blockquote>
+        <p>"The opportunity to give back and help others has brought me immense joy and fulfillment. I encourage everyone to find a cause they are passionate about and get involved." – John Smith</p>
+      </blockquote>
+    </section>
+
+    <section class="call-to-action">
+      <h2>Get Involved</h2>
+      <p>Ready to make a difference? Find a volunteer opportunity that aligns with your interests and get started today!</p>
+      <a href="{% url 'discover' %}" class="btn btn-primary">Explore Opportunities</a>
+    </section>
+  </div>
+{% endblock %}

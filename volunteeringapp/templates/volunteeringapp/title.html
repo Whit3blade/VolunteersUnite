@@ -1,0 +1,85 @@
+{% load my_tags %}
+<!-- Frontend code to help make the logo more "dyanmic" -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const header = document.getElementById("header");
+  const appTitleLink = document.querySelector("#application_title a");
+
+  appTitleLink.addEventListener("mouseenter", function() {
+    header.classList.add("hover");
+  });
+
+  appTitleLink.addEventListener("mouseleave", function() {
+    header.classList.remove("hover");
+  });
+})
+</script>
+
+<nav class="navbar navbar-expand-md sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">
+      <img src="../../../media/volunteer.png" id="logo" alt="site logo" width="50px" height="50px">
+      VolunteersUnite
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto" id="navigation">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'discover' %}">Discover Opportunities <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'whyvolunteer' %}">Why Volunteer <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'about' %}">About Us <span class="sr-only">(current)</span></a>
+        </li>
+        <!-- Authenticated views of each in the navigational bar -->
+        {% if user.is_authenticated %}
+          {% if user.appuser.account_type == 'participant' %}
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'participant_profile' %}">Hello {{ user.first_name }}<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'your_events' %}">Your Events<span class="sr-only">(current)</span></a>
+            </li>
+          {% elif user.appuser.account_type == 'organiser' %}
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'organiser_profile' %}">Hello {{ user.first_name }}<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'create_event' %}">Create Event<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'your_events' %}">Your Events<span class="sr-only">(current)</span></a>
+            </li>
+          {% elif user.appuser.account_type == 'administrator' %}
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'organiser_profile' %}">Organiser Mode<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'create_event' %}">Create Event<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'your_events' %}">All Events<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'manage_categories' %}">Admin Settings<span class="sr-only">(current)</span></a>
+            </li>
+          {% endif %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
+          </li>
+        {% else %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'register' %}">Register<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'login' %}">Log In<span class="sr-only">(current)</span></a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

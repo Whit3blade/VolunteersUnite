@@ -1,0 +1,65 @@
+{% extends './base.html' %}
+
+{% block title %}
+    All Events
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1>Discover Events</h1>
+
+    <!-- FILTERING OPTION FOR THE USER -->
+    <div class="filter-options">
+        <form method="get">
+            {% if user.appuser.account_type == 'organiser' or user.appuser.account_type == 'administrator' %}
+            <select name="status">
+                <option value="">All Events</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active Events</option>
+                <option value="closed" {% if status == 'closed' %}selected{% endif %}>Closed Events</option>
+            </select>
+            {% endif %}
+
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="sort_by">
+                <option value="date_asc" {% if sort_option == 'date_asc' %}selected{% endif %}>Sort by Date (Ascending)</option>
+                <option value="date_desc" {% if sort_option == 'date_desc' %}selected{% endif %}>Sort by Date (Descending)</option>
+                <option value="title_asc" {% if sort_option == 'title_asc' %}selected{% endif %}>Sort by Title (A-Z)</option>
+                <option value="title_desc" {% if sort_option == 'title_desc' %}selected{% endif %}>Sort by Title (Z-A)</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+    <br>
+    <!-- RENDER THE EVENTS ON THE PAGE -->
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="card mb-4 event-card">
+            {% if event.event_image %}
+              <img src="{{ event.event_image.url }}" class="card-img-top event-img" alt="{{ event.title }}">
+            {% endif %}
+            <div class="card-body event-card-body">
+              <h5 class="card-title event-title">{{ event.title }}</h5>
+              <p><strong>Date:</strong> {{ event.date }}</p>
+              <p>{{ event.location }}</p>
+              <p><a class="organiser-link" href="{% url 'organiser_upcoming_events_by_name' organisation_name=event.organiser.organisation_name %}">{{ event.organiser.organisation_name }}</a></p>
+              <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-primary">View Event</a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p>No events available at the moment.</p>
+        {% endfor %}
+    </div>
+
+  </div>
+{% endblock %}

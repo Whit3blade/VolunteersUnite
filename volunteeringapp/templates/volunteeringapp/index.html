@@ -1,0 +1,58 @@
+{% extends './base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="welcometext">
+      <br><br><br>
+      <h2 class="text-center"><bold>Together, we can help one another lead better lives in our island home.</bold></h2>
+      <br>
+      <br>
+      <h4 class="text-center">We have curated the following volunteering opportunities for you!</h4>
+      <h4 class="text-center">Find the opportunity that strikes a chord to kick start your volunteering journey today!</h4>
+      <br><br><br><br>
+    </div>
+    
+
+    <h3>Discover causes that matter to you</h3>
+    <br>
+    {% if prompt %}
+      <div class="alert alert-info">
+        {{ prompt }}
+      </div>
+    {% endif %}
+
+    <br>
+    <!-- Renders the list of random else personalised events -->
+    <ul class="event-list">
+      {% for event in events %}
+        <li class="event-item">
+          <div class="event-image">
+            <img src="{{ event.event_image.url }}" alt="{{ event.title }}">
+          </div>
+          <div class="event-details">
+            <h2>{{ event.title }}</h2>
+            <p><strong>Date:</strong> {{ event.date }}</p>
+            <p>
+              
+              {% with event.description|slice:":200"|truncatewords:200 as desc %}
+                {{ desc }}{% if event.description|length > 200 %}...{% endif %}
+              {% endwith %}
+            </p>
+            <p><a href="{% url 'organiser_upcoming_events_by_name' organisation_name=event.organiser.organisation_name %}">{{ event.organiser.organisation_name }}</a></p>
+            {% for tag in event.preference_tags.all %}
+                <a href="{% url 'discover' %}?category={{ tag.id }}" span class="btn btn-outline-primary btn-sm">{{ tag }}</span></a>
+            {% endfor %}
+            <br>
+            <a href="{% url 'event_detail' event.id %}" class="btn btn-primary btn-right">View Details</a>
+          </div>
+        </li>
+      {% empty %}
+        <li>No events available.</li>
+      {% endfor %}
+      <br><br>
+      <div class="text-center">
+        <a href="{% url 'discover' %}" class="btn btn-primary discover-btn">Discover more!</a>
+      </div>
+    </ul>
+  </div>
+{% endblock %}

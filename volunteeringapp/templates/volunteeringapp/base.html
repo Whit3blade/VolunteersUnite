@@ -1,0 +1,13 @@
+{% include "./header.html" %}
+{% include "./title.html" %}
+
+<div class="container-fluid">
+  <!-- Bulk of where everything will be generated on -->
+  <div class="row">
+    <div  class="col-12" class="content">
+      {% block content %}Didn't render content{% endblock %}
+    </div>
+  </div>
+</div>
+
+{% include "./footer.html" %}
